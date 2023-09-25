@@ -6,6 +6,7 @@ use ManhNT\Slack\Contracts\{
     StringAble,
     MessageContent,
 };
+use ManhNT\Slack\Enums\TextFormat;
 
 class TextContent implements MessageContent, StringAble
 {
@@ -28,6 +29,13 @@ class TextContent implements MessageContent, StringAble
     public function getContent()
     {
         return $this->__toString();
+    }
+
+    public static function format(string $content, TextFormat $format)
+    {
+        $class = __NAMESPACE__ . "\\{$format->name}";
+
+        return (new $class)->setContent($content);
     }
 
     public function fromText(string $text): self
