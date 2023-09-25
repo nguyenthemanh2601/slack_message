@@ -2,25 +2,47 @@
 
 namespace ManhNT\Slack\Components;
 
-use ManhNT\Slack\Contracts\{StringAble, InvokeAble};
+use ManhNT\Slack\Contracts\{
+    StringAble,
+    InvokeAble,
+    MessageContent,
+};
 use Illuminate\Support\Str;
 
-class BlockQuote implements StringAble, InvokeAble
+class BlockQuote implements MessageContent, StringAble, InvokeAble
 {
     public string|null $object;
 
     public function __construct(string $content = null)
     {
         if ($content) {
-            $this->content($content);
+            $this->setContent($content);
         }
     }
 
-    public function content(string $value)
+    public function setContent(string $value): self
     {
-        $this->object = Str::replace("\n", ">", $value);
+        $this->object = Str::replace("\n", "\n>", $value);
+        $this->object = Str::startsWith($this->object, ">") ? $this->object : ">{$this->object}";
 
         return $this;
+    }
+
+    public function getContent()
+    {
+        return $this->__toString();
+    }
+
+    public function toArray()
+    {
+        return [
+            'text' => $this->__toString()
+        ];
+    }
+
+    public function toJson($options = 0)
+    {
+        return json_encode($this->getContent(), $options);
     }
 
     /**
